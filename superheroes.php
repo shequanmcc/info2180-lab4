@@ -1,5 +1,5 @@
 <?php
-
+header('Content-Type: text/html; charset=UTF-8');
 $superheroes = [
   [
       "id" => 1,
@@ -60,13 +60,30 @@ $superheroes = [
       "name" => "Wanda Maximoff",
       "alias" => "Scarlett Witch",
       "biography" => "Notably powerful, Wanda Maximoff has fought both against and with the Avengers, attempting to hone her abilities and do what she believes is right to help the world.",
-  ], 
-];
+  ],
+]; 
 
-?>
 
-<ul>
-<?php foreach ($superheroes as $superhero): ?>
-  <li><?= $superhero['alias']; ?></li>
-<?php endforeach; ?>
-</ul>
+
+$q = isset($_GET['query']) ? trim($_GET['query']) : '';
+
+if ($q === '') {
+    echo "<ul>";
+    foreach ($superheroes as $hero) {
+        echo "<li>" . htmlspecialchars($hero['alias']) . "</li>";
+    }
+    echo "</ul>";
+} else {
+    $results = array_filter($superheroes, function ($hero) use ($q) {
+        return strcasecmp($hero['alias'], $q) === 0 || strcasecmp($hero['name'], $q) === 0;
+    });
+
+    if (!empty($results)) {
+        $hero = array_values($results)[0];
+        echo "<h3>" . htmlspecialchars($hero['alias']) . "</h3>";
+        echo "<h4>A.K.A " . htmlspecialchars($hero['name']) . "</h4>";
+        echo "<p>" . htmlspecialchars($hero['biography']) . "</p>";
+    } else {
+        echo "<p>Superhero not found</p>";
+    }
+}
